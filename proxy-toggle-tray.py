@@ -8,6 +8,7 @@ import pystray
 from PIL import Image, ImageDraw
 import threading
 import sys
+import time
 
 def get_proxy_status():
     """Check if proxy is enabled via gsettings"""
@@ -74,12 +75,28 @@ def create_menu():
         pystray.MenuItem("Exit", on_exit)
     )
 
+def status_checker(icon):
+    """Background thread to periodically check proxy status"""
+    last_status = None
+    while True:
+        time.sleep(1)  # Check every second
+        enabled = get_proxy_status()
+        if enabled != last_status:
+            last_status = enabled
+            # Update icon and menu
+            icon.icon = create_icon(enabled)
+            icon.menu = create_menu()
+
 def main():
     # Initial status
     enabled = get_proxy_status()
     
     # Create icon
     icon = pystray.Icon("proxy-toggle", create_icon(enabled), "Proxy Toggle", create_menu())
+    
+    # Start background thread to check status periodically
+    checker_thread = threading.Thread(target=status_checker, args=(icon,), daemon=True)
+    checker_thread.start()
     
     # Run the icon (this blocks until stopped)
     icon.run()

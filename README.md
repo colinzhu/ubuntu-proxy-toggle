@@ -7,7 +7,6 @@ A simple GUI app to quickly toggle system proxy on Ubuntu without going through 
 - Toggle proxy on/off with a single click
 - Real-time status display
 - Works with Ubuntu's built-in proxy settings (gsettings)
-- Default proxy: 127.0.0.1:8080 (adjust in code if needed)
 
 ## Versions
 
