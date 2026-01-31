@@ -61,22 +61,6 @@ class ProxyToggleApp:
                 check=True
             )
             
-            # Also update the http/https/ftp/socks modes
-            if new_mode == 'manual':
-                # Set default proxy settings if enabling
-                subprocess.run([
-                    'gsettings', 'set', 'org.gnome.system.proxy.http', 'host', "'127.0.0.1'"
-                ], check=True)
-                subprocess.run([
-                    'gsettings', 'set', 'org.gnome.system.proxy.http', 'port', '8080'
-                ], check=True)
-                subprocess.run([
-                    'gsettings', 'set', 'org.gnome.system.proxy.https', 'host', "'127.0.0.1'"
-                ], check=True)
-                subprocess.run([
-                    'gsettings', 'set', 'org.gnome.system.proxy.https', 'port', '8080'
-                ], check=True)
-            
             self.update_status()
             
         except subprocess.CalledProcessError as e:

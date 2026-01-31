@@ -7,6 +7,7 @@ import subprocess
 import pystray
 from PIL import Image, ImageDraw
 import threading
+import sys
 
 def get_proxy_status():
     """Check if proxy is enabled via gsettings"""
@@ -30,22 +31,6 @@ def toggle_proxy():
             ['gsettings', 'set', 'org.gnome.system.proxy', 'mode', new_mode],
             check=True
         )
-        
-        # Also update the http/https/ftp/socks modes
-        if new_mode == 'manual':
-            # Set default proxy settings if enabling
-            subprocess.run([
-                'gsettings', 'set', 'org.gnome.system.proxy.http', 'host', "'127.0.0.1'"
-            ], check=True)
-            subprocess.run([
-                'gsettings', 'set', 'org.gnome.system.proxy.http', 'port', '8080'
-            ], check=True)
-            subprocess.run([
-                'gsettings', 'set', 'org.gnome.system.proxy.https', 'host', "'127.0.0.1'"
-            ], check=True)
-            subprocess.run([
-                'gsettings', 'set', 'org.gnome.system.proxy.https', 'port', '8080'
-            ], check=True)
         
         return True
     except Exception:
@@ -73,6 +58,11 @@ def on_clicked(icon, item):
         # Update menu to show new status
         icon.menu = create_menu()
 
+def on_exit(icon, item):
+    """Handle exit"""
+    icon.stop()
+    sys.exit(0)
+
 def create_menu():
     """Create the menu with current status"""
     enabled = get_proxy_status()
@@ -81,7 +71,7 @@ def create_menu():
     return pystray.Menu(
         pystray.MenuItem(f"Proxy: {status}", lambda: None, enabled=False),
         pystray.MenuItem("Toggle Proxy", on_clicked),
-        pystray.MenuItem("Exit", lambda icon, item: icon.stop())
+        pystray.MenuItem("Exit", on_exit)
     )
 
 def main():
@@ -91,16 +81,8 @@ def main():
     # Create icon
     icon = pystray.Icon("proxy-toggle", create_icon(enabled), "Proxy Toggle", create_menu())
     
-    # Run in a separate thread to avoid blocking
-    threading.Thread(target=icon.run, daemon=True).start()
-    
-    # Keep main thread alive
-    try:
-        while True:
-            import time
-            time.sleep(1)
-    except KeyboardInterrupt:
-        icon.stop()
+    # Run the icon (this blocks until stopped)
+    icon.run()
 
 if __name__ == "__main__":
     main()
