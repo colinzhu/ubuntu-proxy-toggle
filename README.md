@@ -9,6 +9,18 @@ A simple GUI app to quickly toggle system proxy on Ubuntu without going through 
 - Works with Ubuntu's built-in proxy settings (gsettings)
 - Default proxy: 127.0.0.1:8080 (adjust in code if needed)
 
+## Versions
+
+### 1. Window Version (`proxy-toggle.py`)
+- Simple GUI window that stays on top
+- No additional packages required
+- Works out of the box
+
+### 2. System Tray Version (`proxy-toggle-tray.py`)
+- Runs in the Ubuntu status bar
+- Click icon in tray to toggle
+- Requires additional system packages (see setup-tray.sh)
+
 ## Requirements
 
 - Ubuntu with GNOME desktop
@@ -17,34 +29,30 @@ A simple GUI app to quickly toggle system proxy on Ubuntu without going through 
 
 ## Installation
 
+### Window Version (Recommended - works immediately)
 ```bash
-# Make executable
 chmod +x proxy-toggle.py
-
-# Run directly
 ./proxy-toggle.py
+```
 
-# Or add to your PATH for quick access
-sudo cp proxy-toggle.py /usr/local/bin/proxy-toggle
-sudo chmod +x /usr/local/bin/proxy-toggle
+### System Tray Version (Requires setup)
+```bash
+# Run the setup script
+./setup-tray.sh
+
+# Then run the tray version
+./proxy-toggle-tray.py
 ```
 
 ## Usage
 
 ```bash
-# Run the app
+# Window version (stays on top)
 ./proxy-toggle.py
 
-# Or from anywhere if installed to PATH
-proxy-toggle
+# System tray version (in status bar)
+./proxy-toggle-tray.py
 ```
-
-## Customization
-
-Edit `proxy-toggle.py` to change:
-- Default proxy host/port (lines 68-76)
-- Window size (line 18)
-- Colors and styling
 
 ## Desktop Integration
 
@@ -61,4 +69,19 @@ Terminal=false
 Type=Application
 Categories=Utility;Network;
 EOF
+```
+
+For system tray version, replace the Exec path with `proxy-toggle-tray.py`.
+
+## Auto-start on Login
+
+```bash
+./enable-autostart.sh
+```
+
+This will create a desktop entry that auto-starts the tray version when you log in.
+
+To disable auto-start:
+```bash
+rm ~/.config/autostart/proxy-toggle.desktop
 ```
